@@ -4,7 +4,7 @@ import { NewsComponent } from './news/news.component';
 import { NewsDetailsComponent } from './news/news-details/news-details.component';
 
 const routes: Routes = [
-  {path: '', loadChildren: './tabs/tabs.module#TabsPageModule'},
+  {path: '', pathMatch: 'full', redirectTo: 'news'},
   {path: 'news', component: NewsComponent},
   {path: 'news/:id', component: NewsDetailsComponent}
 ];

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { News } from './models/news';
 import { Subscription } from 'rxjs';
 import { NewsType } from './models/news-types.enum';
@@ -7,32 +7,34 @@ import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
 
 import { zip } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-news',
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss']
 })
-export class NewsComponent implements OnInit {
+export class NewsComponent {
   protected allNews: Array<News>;
   newsTypes: Array<NewsType>;
   selectedNewsType: NewsType;
   loaded = false;
   getUpdatedNewsSubscription: Subscription;
-  newsSubscription: Subscription;
 
   constructor(
     public navCtrl: NavController,
     public alertController: AlertController,
     private newsService: NewsService,
-    private signalRService: NewsSignalrService
+    private signalRService: NewsSignalrService,
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     const getAllNews = this.newsService.getAllNews();
     const getAllNewsTypes = this.newsService.getAllNewsTypes();
 
-    this.newsSubscription = zip(getAllNews, getAllNewsTypes).subscribe(
+    zip(getAllNews, getAllNewsTypes).subscribe(
       ([news, newsTypes]) => {
         this.allNews = news;
         this.newsTypes = newsTypes;
@@ -56,13 +58,10 @@ export class NewsComponent implements OnInit {
   ionViewWillLeave() {
     this.signalRService.stopConnection();
     this.getUpdatedNewsSubscription.unsubscribe();
-    this.newsSubscription.unsubscribe();
   }
 
-  itemTapped(event, item: News) {
-    // this.navCtrl.push(NewsDetailsPage, {
-    //   item: item
-    // });
+  itemTapped(event, news: News) {
+    this.navCtrl.navigateForward([news.id], { relativeTo: this.route});
   }
 
   async presentAlert(message: string) {
@@ -96,9 +95,6 @@ export class NewsComponent implements OnInit {
       this.allNews = news;
       event.detail.complete();
     });
-  }
-
-  ngOnInit() {
   }
 
   /**

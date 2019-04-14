@@ -11,7 +11,7 @@ import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
 
 import {
-  MatButtonModule,
+  MatButtonModule, MatCardModule,
   MatDatepickerModule,
   MatIconModule,
   MatInputModule,
@@ -27,6 +27,7 @@ import {
     IonicModule,
     CommonModule,
     FormsModule,
+    MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatInputModule,
@@ -47,6 +48,7 @@ import {
     MatNativeDateModule,
     MatSelectModule,
     MatOptionModule,
+    MatCardModule,
     NewsComponent,
     NewsDetailsComponent
   ],

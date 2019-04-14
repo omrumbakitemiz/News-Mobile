@@ -14,7 +14,9 @@ export class NewsSignalrService {
   private hubConnection: signalR.HubConnection;
 
   public startConnection = () => {
-    this.hubConnection = new signalR.HubConnectionBuilder().withUrl('https://immino-news-api.herokuapp.com/newsHub').build();
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('https://immino-news-api.herokuapp.com/newsHub')
+      .build();
 
     this.hubConnection
       .start()
@@ -31,22 +33,27 @@ export class NewsSignalrService {
 
   public addNewsDataListener = () => {
     this.hubConnection.on('AddNews', newNews => {
-      console.log('addNewsDataListener');
       this.newNews = newNews;
       this.news.next(newNews);
     });
-  };
+  }
 
   public addLikeListener = () => {
-    this.hubConnection.on('LikeNews', likedNews => this.news.next(likedNews));
-  };
+    this.hubConnection.on('LikeNews', likedNews => {
+      this.news.next(likedNews);
+    });
+  }
 
   public addDislikeListener = () => {
-    this.hubConnection.on('DislikeNews', dislikedNews => this.news.next(dislikedNews));
-  };
+    this.hubConnection.on('DislikeNews', dislikedNews => {
+      this.news.next(dislikedNews);
+    });
+  }
 
   public addViewListener() {
-    this.hubConnection.on('ViewNews', viewedNews => this.news.next(viewedNews));
+    this.hubConnection.on('ViewNews', viewedNews => {
+      this.news.next(viewedNews);
+    });
   }
 
   public getUpdatedNews(): Observable<News> {

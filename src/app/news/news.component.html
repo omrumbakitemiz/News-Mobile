@@ -1,10 +1,10 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
     <ion-title>News</ion-title>
-  </ion-navbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -16,49 +16,36 @@
       refreshingText="Refreshing...">
     </ion-refresher-content>
   </ion-refresher>
-  <ion-content padding>
+  <ion-content class="d-flex ion-justify-content-center" padding>
     <mat-card *ngIf="!loaded">
       <mat-card-content>
         <mat-spinner class="spinner-margin" color="primary"></mat-spinner>
       </mat-card-content>
     </mat-card>
 
-    <ng-container *ngIf="loaded">
-      <ion-grid>
-        <ion-row class="news-type-row">
-          <ion-col>
-            <mat-form-field>
-              <mat-label>News Type</mat-label>
-              <select matNativeControl (change)="onNewsTypeChange()" [(ngModel)]="selectedNewsType">
-                <option>None</option>
-                <option *ngFor="let newsType of newsTypes">
-                  {{ newsType }}
-                </option>
-              </select>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+    <mat-form-field class="news-type" *ngIf="loaded">
+      <mat-label>News Type</mat-label>
+      <select matNativeControl (change)="onNewsTypeChange()" [(ngModel)]="selectedNewsType">
+        <option>None</option>
+        <option *ngFor="let newsType of newsTypes">
+          {{ newsType }}
+        </option>
+      </select>
+    </mat-form-field>
 
-      <ng-container *ngFor="let news of allNews">
-        <ion-grid>
-          <ion-row class="news-row">
-            <ion-col>
-              <button ion-item *ngIf="!news.hidden" (click)="itemTapped($event, news)">
-                <ion-card class="news-card">
-                  <ion-card-header>
-                    <ion-card-title>{{ news.title }}</ion-card-title>
-                  </ion-card-header>
+    <ng-container *ngFor="let news of allNews">
+      <ion-card *ngIf="!news.hidden" (click)="itemTapped($event, news)">
+        <ion-item>
+          <ion-icon name="paper" slot="start"></ion-icon>
+          <ion-label>{{ news.title }}</ion-label>
+          <ion-button fill="outline" slot="end">View</ion-button>
+        </ion-item>
 
-                  <ion-card-content class="news-text">
-                    {{ news.text }}
-                  </ion-card-content>
-                </ion-card>
-              </button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ng-container>
+        <ion-card-content>
+          {{ news.text }}
+        </ion-card-content>
+      </ion-card>
     </ng-container>
+
   </ion-content>
 </ion-content>

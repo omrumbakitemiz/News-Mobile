@@ -1,3 +1,55 @@
-<p>
-  news-details works!
-</p>
+<!--<ion-header>-->
+<!--  <ion-navbar>-->
+<!--    <button menuToggle *ngIf="!selectedNews">-->
+<!--      <ion-icon name="menu"></ion-icon>-->
+<!--    </button>-->
+<!--    <ion-title>News Details</ion-title>-->
+<!--  </ion-navbar>-->
+<!--</ion-header>-->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back to News" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="selectedNews">
+  <p text-center>View: {{ selectedNews.viewCount }}</p>
+  <h5 text-center *ngIf="selectedNews">
+    You are reading: <b>{{ selectedNews.title }}</b>
+  </h5>
+  <div class="d-flex justify-content-center my-2">
+    <img *ngIf="selectedNews.image; else noImageTemplate" class="news-details-image" [src]="selectedNews.image"
+         alt="News Image"/>
+
+    <ng-template #noImageTemplate>
+      <img
+        class="news-image"
+        mat-card-image
+        src="data:image/png;base64,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"
+        alt="News Image"
+      />
+    </ng-template>
+  </div>
+  <p class="news-details-text" text-center *ngIf="selectedNews">
+    {{ selectedNews.text }}
+  </p>
+  <p class="like-dislike-container" text-center>
+    <button margin mat-icon-button color="primary" (click)="onLike()">
+      <mat-icon>thumb_up_alt</mat-icon>
+      <span class="like">{{ selectedNews.likeCount }}</span>
+    </button>
+    <button margin mat-icon-button color="warn" (click)="onDislike()">
+      <mat-icon>thumb_down_alt</mat-icon>
+      <span class="dislike">{{ selectedNews.dislikeCount }}</span>
+    </button>
+  </p>
+  <p class="d-flex justify-content-center">
+    <button margin mat-raised-button color="danger" (click)="presentActionSheet()">
+      <mat-icon>delete</mat-icon>
+      Delete
+    </button>
+  </p>
+</ion-content>

@@ -1,0 +1,44 @@
+.like-dislike-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.like {
+  margin-left: 3px;
+}
+
+.dislike {
+  margin-left: 3px;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.news-details-text {
+  padding-left: 40px;
+  padding-right: 40px;
+  font-size: 16px;
+}
+
+.news-details-image {
+  height: 200px;
+}
+
+.my-2 {
+  margin-top: 3rem;
+  margin-bottom: 4rem;
+}
+
+.news-image {
+  max-width: 200px;
+}
