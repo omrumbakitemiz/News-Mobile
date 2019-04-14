@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>News</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshNews($event)">
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+  <ion-content padding>
+    <mat-card *ngIf="!loaded">
+      <mat-card-content>
+        <mat-spinner class="spinner-margin" color="primary"></mat-spinner>
+      </mat-card-content>
+    </mat-card>
+
+    <ng-container *ngIf="loaded">
+      <ion-grid>
+        <ion-row class="news-type-row">
+          <ion-col>
+            <mat-form-field>
+              <mat-label>News Type</mat-label>
+              <select matNativeControl (change)="onNewsTypeChange()" [(ngModel)]="selectedNewsType">
+                <option>None</option>
+                <option *ngFor="let newsType of newsTypes">
+                  {{ newsType }}
+                </option>
+              </select>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ng-container *ngFor="let news of allNews">
+        <ion-grid>
+          <ion-row class="news-row">
+            <ion-col>
+              <button ion-item *ngIf="!news.hidden" (click)="itemTapped($event, news)">
+                <ion-card class="news-card">
+                  <ion-card-header>
+                    <ion-card-title>{{ news.title }}</ion-card-title>
+                  </ion-card-header>
+
+                  <ion-card-content class="news-text">
+                    {{ news.text }}
+                  </ion-card-content>
+                </ion-card>
+              </button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ng-container>
+    </ng-container>
+  </ion-content>
+</ion-content>
