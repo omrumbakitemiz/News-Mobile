@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActionSheetController, NavController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
@@ -13,10 +13,10 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './news-details.component.html',
   styleUrls: ['./news-details.component.scss']
 })
-export class NewsDetailsComponent implements OnDestroy {
-  selectedNewsId: string;
-  selectedNews: News;
-  getUpdatedNewsSubscription: Subscription;
+export class NewsDetailsComponent {
+  public selectedNewsId: string;
+  public selectedNews: News;
+  private getUpdatedNewsSubscription: Subscription;
 
   constructor(
     public navCtrl: NavController,
@@ -31,25 +31,29 @@ export class NewsDetailsComponent implements OnDestroy {
     this.route.params.subscribe(params => {
       this.selectedNewsId = params['id'];
 
-      this.signalRService.startConnection();
-      this.signalRService.addLikeListener();
-      this.signalRService.addDislikeListener();
-      this.signalRService.addViewListener();
-      this.newsService.increaseViewCount(this.selectedNewsId).subscribe(news => {
-        this.selectedNews = news;
-      });
+      this.signalRService.startConnection().then(() => {
+        this.signalRService.addLikeListener();
+        this.signalRService.addDislikeListener();
+        this.signalRService.addViewListener();
 
-      this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(updatedNews => {
-        if (updatedNews) {
-          this.selectedNews = updatedNews;
-        }
+        this.newsService.increaseViewCount(this.selectedNewsId).subscribe(news => {
+          this.selectedNews = news;
+        });
+
+        this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(updatedNews => {
+          if (updatedNews) {
+            this.selectedNews = updatedNews;
+          }
+        });
       });
     });
   }
 
-  ngOnDestroy() {
-    this.signalRService.stopConnection();
-    this.getUpdatedNewsSubscription.unsubscribe();
+  ionViewWillLeave() {
+    console.log('viewWillLeave');
+    this.signalRService.stopConnection().then(() => {
+      this.getUpdatedNewsSubscription.unsubscribe();
+    });
   }
 
   onLike() {
@@ -77,22 +81,9 @@ export class NewsDetailsComponent implements OnDestroy {
           this.onDelete();
         }
       }, {
-        text: 'Share',
-        icon: 'share',
-        handler: () => {}
-      }, {
-        text: 'Play (open modal)',
-        icon: 'arrow-dropright-circle',
-        handler: () => {}
-      }, {
-        text: 'Favorite',
-        icon: 'heart',
-        handler: () => {}
-      }, {
         text: 'Cancel',
         icon: 'close',
-        role: 'cancel',
-        handler: () => {}
+        role: 'cancel'
       }]
     });
     await actionSheet.present();

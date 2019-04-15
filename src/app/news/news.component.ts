@@ -15,11 +15,11 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./news.component.scss']
 })
 export class NewsComponent {
-  protected allNews: Array<News>;
-  newsTypes: Array<NewsType>;
-  selectedNewsType: NewsType;
-  loaded = false;
-  getUpdatedNewsSubscription: Subscription;
+  public allNews: Array<News>;
+  public newsTypes: Array<NewsType>;
+  public selectedNewsType: NewsType;
+  public loaded = false;
+  private getUpdatedNewsSubscription: Subscription;
 
   constructor(
     public navCtrl: NavController,
@@ -31,6 +31,7 @@ export class NewsComponent {
   ) { }
 
   ionViewWillEnter() {
+    this.loaded = false;
     const getAllNews = this.newsService.getAllNews();
     const getAllNewsTypes = this.newsService.getAllNewsTypes();
 
@@ -38,15 +39,17 @@ export class NewsComponent {
       ([news, newsTypes]) => {
         this.allNews = news;
         this.newsTypes = newsTypes;
-        this.signalRService.startConnection();
-        this.signalRService.addNewsDataListener();
-        this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(newNews => {
-          if (newNews) {
-            // remove old version of updated news to prevent duplicate news
-            this.allNews = this.removeOldNews(this.allNews, newNews);
-            this.allNews.push(newNews);
-          }
-          this.loaded = true;
+        this.signalRService.startConnection().then(() => {
+
+          this.signalRService.addNewsDataListener();
+          this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(newNews => {
+            if (newNews) {
+              // remove old version of updated news to prevent duplicate news
+              this.allNews = this.removeOldNews(this.allNews, newNews);
+              this.allNews.push(newNews);
+            }
+            this.loaded = true;
+          });
         });
       },
       () => {
@@ -56,8 +59,9 @@ export class NewsComponent {
   }
 
   ionViewWillLeave() {
-    this.signalRService.stopConnection();
-    this.getUpdatedNewsSubscription.unsubscribe();
+    this.signalRService.stopConnection().then(() => {
+      this.getUpdatedNewsSubscription.unsubscribe();
+    });
   }
 
   itemTapped(event, news: News) {

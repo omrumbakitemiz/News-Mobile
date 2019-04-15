@@ -17,11 +17,7 @@
     </ion-refresher-content>
   </ion-refresher>
   <ion-content class="d-flex ion-justify-content-center" padding>
-    <mat-card *ngIf="!loaded">
-      <mat-card-content>
-        <mat-spinner class="spinner-margin" color="primary"></mat-spinner>
-      </mat-card-content>
-    </mat-card>
+    <ion-progress-bar class="progress-bar" *ngIf="!loaded" type="indeterminate"></ion-progress-bar>
 
     <mat-form-field class="news-type" *ngIf="loaded">
       <mat-label>News Type</mat-label>
@@ -34,7 +30,7 @@
     </mat-form-field>
 
     <ng-container *ngFor="let news of allNews">
-      <ion-card *ngIf="!news.hidden" (click)="itemTapped($event, news)">
+      <ion-card *ngIf="!news.hidden && loaded" (click)="itemTapped($event, news)">
         <ion-item>
           <ion-icon name="paper" slot="start"></ion-icon>
           <ion-label>{{ news.title }}</ion-label>

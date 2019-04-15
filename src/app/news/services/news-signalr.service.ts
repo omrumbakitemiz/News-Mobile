@@ -1,3 +1,4 @@
+/* tslint:disable:semicolon */
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -18,37 +19,31 @@ export class NewsSignalrService {
       .withUrl('https://immino-news-api.herokuapp.com/newsHub')
       .build();
 
-    this.hubConnection
-      .start()
-      .then(() => console.log('connection started'))
-      .catch(err => console.log('error:', err));
-  }
+    return this.hubConnection.start();
+  };
 
   public stopConnection = () => {
-    this.hubConnection
-      .stop()
-      .then(() => console.log('connection stopped'))
-      .catch(err => console.log('error:', err));
-  }
+    return this.hubConnection.stop();
+  };
 
   public addNewsDataListener = () => {
     this.hubConnection.on('AddNews', newNews => {
       this.newNews = newNews;
       this.news.next(newNews);
     });
-  }
+  };
 
   public addLikeListener = () => {
     this.hubConnection.on('LikeNews', likedNews => {
       this.news.next(likedNews);
     });
-  }
+  };
 
   public addDislikeListener = () => {
     this.hubConnection.on('DislikeNews', dislikedNews => {
       this.news.next(dislikedNews);
     });
-  }
+  };
 
   public addViewListener() {
     this.hubConnection.on('ViewNews', viewedNews => {
