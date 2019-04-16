@@ -23,6 +23,7 @@ export class NewsSignalrService {
   };
 
   public stopConnection = () => {
+    this.news.next(null);
     return this.hubConnection.stop();
   };
 
