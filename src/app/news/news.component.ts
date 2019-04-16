@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { News } from './models/news';
-import { Subscription } from 'rxjs';
-import { NewsType } from './models/news-types.enum';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, IonRefresher, NavController } from '@ionic/angular';
+
+import { News } from './models/news';
+import { NewsType } from './models/news-types.enum';
 import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
 
-import { zip } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, zip } from 'rxjs';
 
 @Component({
   selector: 'app-news',
@@ -28,15 +28,22 @@ export class NewsComponent {
     private signalRService: NewsSignalrService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) {
+  }
 
   ionViewWillEnter() {
     this.loaded = false;
-    const getAllNews = this.newsService.getAllNews();
-    const getAllNewsTypes = this.newsService.getAllNewsTypes();
 
-    zip(getAllNews, getAllNewsTypes).subscribe(
-      ([news, newsTypes]) => {
+    const requests = zip(
+      this.newsService.getAllNews(),
+      this.newsService.getAllNewsTypes()
+    );
+    requests.subscribe(([news, newsTypes]) => {
+        news.sort((news1, news2) => {
+          const date1 = new Date(news1.publishDate);
+          const date2 = new Date(news2.publishDate);
+          return date1.getTime() - date2.getTime();
+        });
         this.allNews = news;
         this.newsTypes = newsTypes;
         this.signalRService.startConnection().then(() => {
@@ -51,10 +58,7 @@ export class NewsComponent {
             this.loaded = true;
           });
         });
-      },
-      () => {
-        this.presentAlert('Cannot get news right now, please try again later. 😇');
-      }
+      }, () => this.presentAlert('Cannot get news right now, please try again later. 😇')
     );
   }
 
@@ -65,7 +69,7 @@ export class NewsComponent {
   }
 
   itemTapped(event, news: News) {
-    this.navCtrl.navigateForward([news.id], { relativeTo: this.route});
+    this.navCtrl.navigateForward([news.id], {relativeTo: this.route});
   }
 
   async presentAlert(message: string) {

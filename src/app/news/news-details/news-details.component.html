@@ -1,12 +1,3 @@
-<!--<ion-header>-->
-<!--  <ion-navbar>-->
-<!--    <button menuToggle *ngIf="!selectedNews">-->
-<!--      <ion-icon name="menu"></ion-icon>-->
-<!--    </button>-->
-<!--    <ion-title>News Details</ion-title>-->
-<!--  </ion-navbar>-->
-<!--</ion-header>-->
-
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -37,13 +28,13 @@
     {{ selectedNews.text }}
   </p>
   <p class="like-dislike-container" text-center>
-    <button margin mat-icon-button color="primary" (click)="onLike()">
+    <button class="like" mat-icon-button color="primary" (click)="onLike()">
       <mat-icon>thumb_up_alt</mat-icon>
-      <span class="like">{{ selectedNews.likeCount }}</span>
+      <span>{{ selectedNews.likeCount }}</span>
     </button>
-    <button margin mat-icon-button color="warn" (click)="onDislike()">
+    <button class="dislike" mat-icon-button color="warn" (click)="onDislike()">
       <mat-icon>thumb_down_alt</mat-icon>
-      <span class="dislike">{{ selectedNews.dislikeCount }}</span>
+      <span>{{ selectedNews.dislikeCount }}</span>
     </button>
   </p>
   <p class="d-flex justify-content-center">
