@@ -6,7 +6,7 @@ import { News } from '../models/news';
 
 import { NewsService } from '../services/news.service';
 import { NewsSignalrService } from '../services/news-signalr.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-news-details',
@@ -23,7 +23,9 @@ export class NewsDetailsComponent {
     private newsService: NewsService,
     private signalRService: NewsSignalrService,
     private actionSheetController: ActionSheetController,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
+    private newsSignalRService: NewsSignalrService
   ) {
   }
 
@@ -66,7 +68,7 @@ export class NewsDetailsComponent {
 
   onDelete() {
     this.newsService.deleteNews(this.selectedNews.id).subscribe(() => {
-      this.navCtrl.pop().then(() => console.log('popped...'));
+      this.navCtrl.navigateBack(['../news']);
     });
   }
 

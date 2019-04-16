@@ -19,15 +19,17 @@
   <ion-content class="d-flex ion-justify-content-center" padding>
     <ion-progress-bar class="progress-bar" *ngIf="!loaded" type="indeterminate"></ion-progress-bar>
 
-    <mat-form-field class="news-type" *ngIf="loaded">
-      <mat-label>News Type</mat-label>
-      <select matNativeControl (change)="onNewsTypeChange()" [(ngModel)]="selectedNewsType">
-        <option>None</option>
-        <option *ngFor="let newsType of newsTypes">
-          {{ newsType }}
-        </option>
-      </select>
-    </mat-form-field>
+    <div class="d-flex ion-justify-content-center">
+      <mat-form-field class="news-type" *ngIf="loaded">
+        <mat-label>News Type</mat-label>
+        <select matNativeControl (change)="onNewsTypeChange()" [(ngModel)]="selectedNewsType">
+          <option>None</option>
+          <option *ngFor="let newsType of newsTypes">
+            {{ newsType }}
+          </option>
+        </select>
+      </mat-form-field>
+    </div>
 
     <ng-container *ngFor="let news of allNews">
       <ion-card *ngIf="!news.hidden && loaded" (click)="itemTapped($event, news)">
