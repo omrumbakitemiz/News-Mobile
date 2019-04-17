@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { News } from './models/news';
-import { Subscription } from 'rxjs';
-import { NewsType } from './models/news-types.enum';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, IonRefresher, NavController } from '@ionic/angular';
+
+import { News } from './models/news';
+import { NewsType } from './models/news-types.enum';
 import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
 
-import { zip } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, zip } from 'rxjs';
 
 @Component({
   selector: 'app-news',
@@ -28,16 +28,19 @@ export class NewsComponent {
     private signalRService: NewsSignalrService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) {
+  }
 
   ionViewWillEnter() {
     this.loaded = false;
-    const getAllNews = this.newsService.getAllNews();
-    const getAllNewsTypes = this.newsService.getAllNewsTypes();
 
-    zip(getAllNews, getAllNewsTypes).subscribe(
-      ([news, newsTypes]) => {
-        this.allNews = news;
+    const requests = zip(
+      this.newsService.getAllNews(),
+      this.newsService.getAllNewsTypes()
+    );
+    requests.subscribe(([news, newsTypes]) => {
+        this.allNews = news.sort(this.sortFunction);
+
         this.newsTypes = newsTypes;
         this.signalRService.startConnection().then(() => {
 
@@ -47,15 +50,26 @@ export class NewsComponent {
               // remove old version of updated news to prevent duplicate news
               this.allNews = this.removeOldNews(this.allNews, newNews);
               this.allNews.push(newNews);
+              this.allNews = this.allNews.sort(this.sortFunction);
             }
             this.loaded = true;
           });
         });
-      },
-      () => {
-        this.presentAlert('Cannot get news right now, please try again later. 😇');
-      }
+      }, () => this.presentAlert('Cannot get news right now, please try again later. 😇')
     );
+  }
+
+  /**
+   * Bu metod Array.sort() metoduna parametre olarak verilen tarih sıralama metodudur.
+   * Varsayılan olarak diziden küçük tarihten büyüğe doğru sıralama yapar.
+   * @param news1: {News}
+   * @param news2: {News}
+   * @returns {number}
+   */
+  sortFunction(news1: News, news2: News) {
+    const date1 = new Date(news1.publishDate);
+    const date2 = new Date(news2.publishDate);
+    return date2.getTime() - date1.getTime();
   }
 
   ionViewWillLeave() {
@@ -65,7 +79,7 @@ export class NewsComponent {
   }
 
   itemTapped(event, news: News) {
-    this.navCtrl.navigateForward([news.id], { relativeTo: this.route});
+    this.navCtrl.navigateForward([news.id], {relativeTo: this.route});
   }
 
   async presentAlert(message: string) {
@@ -84,7 +98,8 @@ export class NewsComponent {
     if (this.selectedNewsType) {
       if (this.selectedNewsType.toString() === 'None') {
         this.allNews.map(news => (news.hidden = false));
-      } else {
+      }
+      else {
         this.allNews.map(news => {
           if (news.type) {
             news.hidden = news.type !== this.selectedNewsType;
@@ -96,7 +111,7 @@ export class NewsComponent {
 
   refreshNews(event: CustomEvent<IonRefresher>) {
     this.newsService.getAllNews().subscribe(news => {
-      this.allNews = news;
+      this.allNews = news.sort(this.sortFunction);
       event.detail.complete();
     });
   }
