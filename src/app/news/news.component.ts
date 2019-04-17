@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AlertController, IonRefresher, NavController } from '@ionic/angular';
+import { Storage } from '@ionic/storage';
 
 import { News } from './models/news';
 import { NewsType } from './models/news-types.enum';
 import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
 
-import { Subscription, zip } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-news',
@@ -20,29 +22,34 @@ export class NewsComponent {
   public selectedNewsType: NewsType;
   public loaded = false;
   private getUpdatedNewsSubscription: Subscription;
+  private cachedNews: Array<News>;
 
   constructor(
     public navCtrl: NavController,
     public alertController: AlertController,
     private newsService: NewsService,
     private signalRService: NewsSignalrService,
-    private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private storage: Storage
   ) {
   }
 
-  ionViewWillEnter() {
-    this.loaded = false;
+  async ionViewWillEnter() {
+    this.newsService.getAllNewsTypes().subscribe(newsTypes => this.newsTypes = newsTypes);
+    this.cachedNews = await this.storage.get('allNews');
 
-    const requests = zip(
-      this.newsService.getAllNews(),
-      this.newsService.getAllNewsTypes()
-    );
-    requests.subscribe(([news, newsTypes]) => {
+    let newsObservable = this.newsService.getAllNews();
+    if (this.cachedNews) {
+      newsObservable = newsObservable.pipe(startWith(this.cachedNews));
+      this.loaded = true;
+    }
+
+    newsObservable.subscribe((news) => {
         this.allNews = news.sort(this.sortFunction);
 
-        this.newsTypes = newsTypes;
+        this.storage.set('allNews', this.allNews);
         this.signalRService.startConnection().then(() => {
+          this.loaded = true;
 
           this.signalRService.addNewsDataListener();
           this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(newNews => {
@@ -51,25 +58,12 @@ export class NewsComponent {
               this.allNews = this.removeOldNews(this.allNews, newNews);
               this.allNews.push(newNews);
               this.allNews = this.allNews.sort(this.sortFunction);
+              this.storage.set('allNews', this.allNews);
             }
-            this.loaded = true;
           });
         });
       }, () => this.presentAlert('Cannot get news right now, please try again later. 😇')
     );
-  }
-
-  /**
-   * Bu metod Array.sort() metoduna parametre olarak verilen tarih sıralama metodudur.
-   * Varsayılan olarak diziden küçük tarihten büyüğe doğru sıralama yapar.
-   * @param news1: {News}
-   * @param news2: {News}
-   * @returns {number}
-   */
-  sortFunction(news1: News, news2: News) {
-    const date1 = new Date(news1.publishDate);
-    const date2 = new Date(news2.publishDate);
-    return date2.getTime() - date1.getTime();
   }
 
   ionViewWillLeave() {
@@ -82,24 +76,11 @@ export class NewsComponent {
     this.navCtrl.navigateForward([news.id], {relativeTo: this.route});
   }
 
-  async presentAlert(message: string) {
-    const alert = await this.alertController.create({
-      subHeader: 'Oops!',
-      message,
-      buttons: ['OK']
-    });
-
-    alert.onDidDismiss().then(() => (this.loaded = true));
-
-    await alert.present();
-  }
-
   onNewsTypeChange() {
     if (this.selectedNewsType) {
       if (this.selectedNewsType.toString() === 'None') {
         this.allNews.map(news => (news.hidden = false));
-      }
-      else {
+      } else {
         this.allNews.map(news => {
           if (news.type) {
             news.hidden = news.type !== this.selectedNewsType;
@@ -109,11 +90,33 @@ export class NewsComponent {
     }
   }
 
+  async presentAlert(message: string) {
+    const alert = await this.alertController.create({
+      subHeader: 'Oops!',
+      message,
+      buttons: ['OK']
+    });
+
+    alert.onDidDismiss().then(() => this.loaded = true);
+
+    await alert.present();
+  }
+
   refreshNews(event: CustomEvent<IonRefresher>) {
     this.newsService.getAllNews().subscribe(news => {
       this.allNews = news.sort(this.sortFunction);
       event.detail.complete();
     });
+  }
+
+  /**
+   * Bu metod Array.sort() metoduna parametre olarak verilen tarih sıralama metodudur.
+   * Varsayılan olarak küçük tarihten büyüğe doğru sıralama yapar.
+   */
+  sortFunction(news1: News, news2: News) {
+    const date1 = new Date(news1.publishDate);
+    const date2 = new Date(news2.publishDate);
+    return date2.getTime() - date1.getTime();
   }
 
   /**
@@ -129,5 +132,4 @@ export class NewsComponent {
     }
     return newNewsArray;
   }
-
 }

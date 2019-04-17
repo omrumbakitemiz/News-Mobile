@@ -4,6 +4,7 @@ import { RouteReuseStrategy } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { IonicStorageModule } from '@ionic/storage';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
@@ -14,7 +15,14 @@ import { NewsModule } from './news/news.module';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BrowserAnimationsModule, NewsModule],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    NewsModule
+  ],
   providers: [StatusBar, SplashScreen, {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}],
   bootstrap: [AppComponent]
 })
