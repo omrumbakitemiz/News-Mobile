@@ -20,6 +20,7 @@ import {
   MatProgressSpinnerModule,
   MatSelectModule
 } from '@angular/material';
+import { UserService } from './services/user.service';
 
 @NgModule({
   declarations: [NewsComponent, NewsDetailsComponent],
@@ -52,7 +53,7 @@ import {
     NewsComponent,
     NewsDetailsComponent
   ],
-  providers: [NewsService, NewsSignalrService],
+  providers: [NewsService, NewsSignalrService, UserService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class NewsModule {

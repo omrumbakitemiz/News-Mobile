@@ -10,6 +10,7 @@ import { NewsSignalrService } from './services/news-signalr.service';
 
 import { Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-news',
@@ -29,8 +30,9 @@ export class NewsComponent {
     public alertController: AlertController,
     private newsService: NewsService,
     private signalRService: NewsSignalrService,
+    private userService: UserService,
     private route: ActivatedRoute,
-    private storage: Storage
+    private storage: Storage,
   ) {
   }
 
