@@ -39,7 +39,7 @@ export class NewsComponent {
       this.newsService.getAllNewsTypes()
     );
     requests.subscribe(([news, newsTypes]) => {
-        this.allNews = news.sort(this.sortFunction).reverse();
+        this.allNews = news.sort(this.sortFunction);
 
         this.newsTypes = newsTypes;
         this.signalRService.startConnection().then(() => {
@@ -50,7 +50,7 @@ export class NewsComponent {
               // remove old version of updated news to prevent duplicate news
               this.allNews = this.removeOldNews(this.allNews, newNews);
               this.allNews.push(newNews);
-              this.allNews = this.allNews.sort(this.sortFunction).reverse();
+              this.allNews = this.allNews.sort(this.sortFunction);
             }
             this.loaded = true;
           });
@@ -69,7 +69,7 @@ export class NewsComponent {
   sortFunction(news1: News, news2: News) {
     const date1 = new Date(news1.publishDate);
     const date2 = new Date(news2.publishDate);
-    return date1.getTime() - date2.getTime();
+    return date2.getTime() - date1.getTime();
   }
 
   ionViewWillLeave() {
@@ -111,7 +111,7 @@ export class NewsComponent {
 
   refreshNews(event: CustomEvent<IonRefresher>) {
     this.newsService.getAllNews().subscribe(news => {
-      this.allNews = news;
+      this.allNews = news.sort(this.sortFunction);
       event.detail.complete();
     });
   }
