@@ -39,12 +39,8 @@ export class NewsComponent {
       this.newsService.getAllNewsTypes()
     );
     requests.subscribe(([news, newsTypes]) => {
-        news.sort((news1, news2) => {
-          const date1 = new Date(news1.publishDate);
-          const date2 = new Date(news2.publishDate);
-          return date1.getTime() - date2.getTime();
-        });
-        this.allNews = news;
+        this.allNews = news.sort(this.sortFunction).reverse();
+
         this.newsTypes = newsTypes;
         this.signalRService.startConnection().then(() => {
 
@@ -54,12 +50,26 @@ export class NewsComponent {
               // remove old version of updated news to prevent duplicate news
               this.allNews = this.removeOldNews(this.allNews, newNews);
               this.allNews.push(newNews);
+              this.allNews = this.allNews.sort(this.sortFunction).reverse();
             }
             this.loaded = true;
           });
         });
       }, () => this.presentAlert('Cannot get news right now, please try again later. 😇')
     );
+  }
+
+  /**
+   * Bu metod Array.sort() metoduna parametre olarak verilen tarih sıralama metodudur.
+   * Varsayılan olarak diziden küçük tarihten büyüğe doğru sıralama yapar.
+   * @param news1: {News}
+   * @param news2: {News}
+   * @returns {number}
+   */
+  sortFunction(news1: News, news2: News) {
+    const date1 = new Date(news1.publishDate);
+    const date2 = new Date(news2.publishDate);
+    return date1.getTime() - date2.getTime();
   }
 
   ionViewWillLeave() {
@@ -88,7 +98,8 @@ export class NewsComponent {
     if (this.selectedNewsType) {
       if (this.selectedNewsType.toString() === 'None') {
         this.allNews.map(news => (news.hidden = false));
-      } else {
+      }
+      else {
         this.allNews.map(news => {
           if (news.type) {
             news.hidden = news.type !== this.selectedNewsType;

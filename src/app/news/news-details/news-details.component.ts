@@ -74,7 +74,7 @@ export class NewsDetailsComponent {
 
   async presentActionSheet() {
     const actionSheet = await this.actionSheetController.create({
-      header: 'Albums',
+      header: 'Choose action...',
       buttons: [{
         text: 'Delete',
         role: 'destructive',
