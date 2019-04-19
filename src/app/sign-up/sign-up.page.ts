@@ -39,10 +39,11 @@ export class SignUpPage implements OnInit {
     if (value) {
       this.presentLoading().then(() => {
         this.userService.register(value).subscribe(
-          registeredUser => {
-            this.storage.set('user', registeredUser).then(() => {
-              this.loading.dismiss();
-            });
+          () => {
+            // this.storage.set('token', registeredUser).then(() => {
+            //   this.loading.dismiss();
+            // });
+            this.loading.dismiss();
           },
           error => {
             console.log(error);
@@ -68,8 +69,13 @@ export class SignUpPage implements OnInit {
   }
 
   async presentToast(message?: Array<string>) {
+    let errorMessage = 'An error occured!';
+    if (message && message instanceof Array) {
+      errorMessage = message.join('\n\n');
+    }
     this.toast = await this.toastController.create({
-      message: message.join('\n\n') || 'An error occured!',
+      message: errorMessage,
+      duration: 10000,
       showCloseButton: true,
     });
     this.toast.present();

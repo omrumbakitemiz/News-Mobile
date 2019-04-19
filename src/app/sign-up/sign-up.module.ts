@@ -15,7 +15,6 @@ import {
   MatNativeDateModule, MatOptionModule,
   MatProgressSpinnerModule, MatSelectModule
 } from '@angular/material';
-import { UserService } from '../news/services/user.service';
 
 const routes: Routes = [
   {
@@ -42,6 +41,6 @@ const routes: Routes = [
     MatOptionModule,
   ],
   declarations: [SignUpPage],
-  providers: [UserService]
+  providers: []
 })
 export class SignUpPageModule {}

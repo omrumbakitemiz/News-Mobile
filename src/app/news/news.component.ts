@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, IonRefresher, NavController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
@@ -17,7 +17,7 @@ import { UserService } from './services/user.service';
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss']
 })
-export class NewsComponent {
+export class NewsComponent implements OnInit {
   public allNews: Array<News>;
   public newsTypes: Array<NewsType>;
   public selectedNewsType: NewsType;
@@ -34,6 +34,14 @@ export class NewsComponent {
     private route: ActivatedRoute,
     private storage: Storage,
   ) {
+  }
+
+  ngOnInit(): void {
+    this.storage.get('user').then(user => {
+      if (user) {
+        this.userService.isAuthenticated.next(true);
+      }
+    });
   }
 
   async ionViewWillEnter() {
@@ -82,7 +90,8 @@ export class NewsComponent {
     if (this.selectedNewsType) {
       if (this.selectedNewsType.toString() === 'None') {
         this.allNews.map(news => (news.hidden = false));
-      } else {
+      }
+      else {
         this.allNews.map(news => {
           if (news.type) {
             news.hidden = news.type !== this.selectedNewsType;

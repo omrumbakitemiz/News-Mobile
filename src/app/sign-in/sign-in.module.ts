@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import {
@@ -18,7 +18,6 @@ import {
 import { IonicModule } from '@ionic/angular';
 
 import { SignInPage } from './sign-in.page';
-import { UserService } from '../news/services/user.service';
 
 const routes: Routes = [
   {
@@ -42,9 +41,10 @@ const routes: Routes = [
     MatNativeDateModule,
     MatSelectModule,
     MatOptionModule,
+    ReactiveFormsModule,
   ],
   declarations: [SignInPage],
-  providers: [UserService],
+  providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SignInPageModule {}

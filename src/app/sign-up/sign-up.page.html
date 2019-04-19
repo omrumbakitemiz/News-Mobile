@@ -6,8 +6,9 @@
 
 <ion-content>
   <form class="sign-up-form" [formGroup]="signUpFormGroup" (ngSubmit)="onFormSubmit()">
-    <mat-form-field class="w-100">
-      <input type="text" matInput placeholder="Username" formControlName="username">
+    <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
+      <mat-label>Username</mat-label>
+      <input type="text" matInput formControlName="username">
       <mat-error *ngIf="signUpFormGroup.get('username').hasError('username') && !signUpFormGroup.get('username').hasError('required')">
         Please enter a valid username
       </mat-error>
@@ -16,8 +17,9 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="w-100">
-      <input type="email" matInput placeholder="E-mail" formControlName="email">
+    <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
+      <mat-label>Email</mat-label>
+      <input type="email" matInput placeholder="example@mail.com" formControlName="email">
       <mat-error *ngIf="signUpFormGroup.get('email').hasError('email') && !signUpFormGroup.get('email').hasError('required')">
         Please enter a valid email address
       </mat-error>
@@ -26,8 +28,9 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="w-100">
-      <input type="password" matInput placeholder="Password" formControlName="passwordHash">
+    <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
+      <mat-label>Password</mat-label>
+      <input type="password" matInput formControlName="passwordHash">
       <mat-error *ngIf="signUpFormGroup.get('passwordHash').hasError('passwordHash') && !signUpFormGroup.get('passwordHash').hasError('required')">
         Please enter a valid password
       </mat-error>
@@ -36,8 +39,9 @@
       </mat-error>
     </mat-form-field>
 
-    <div class="d-flex ion-justify-content-center w-100 ion-margin-top">
-      <button type="submit" mat-stroked-button color="primary">Sign Up</button>
+    <div class="d-flex flex-direction-column ion-align-items-center w-100">
+      <button class="sign-up-button" type="submit" mat-stroked-button color="primary">Sign Up</button>
+      <a routerLink="/sign-in">Sign In</a>
     </div>
   </form>
 </ion-content>
