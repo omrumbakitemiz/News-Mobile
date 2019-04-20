@@ -4,13 +4,15 @@ import { User } from '../models/user';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { RegisterResource } from '../models/registerResource';
 import { LoginResource } from '../models/loginResource';
+import { baseUrl } from '../models/baseUrl';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  userUrl = `http://localhost:5000/api/user`;
+  userUrl = `${ baseUrl }/user`;
   isAuthenticated = new BehaviorSubject<boolean>(false);
+  token = new BehaviorSubject<string>('');
 
   constructor(private http: HttpClient) {
   }

@@ -40,6 +40,7 @@ export class NewsComponent implements OnInit {
     this.storage.get('user').then(user => {
       if (user) {
         this.userService.isAuthenticated.next(true);
+        this.userService.token.next(user.token);
       }
     });
   }

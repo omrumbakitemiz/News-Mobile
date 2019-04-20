@@ -44,6 +44,7 @@ export class SignInPage implements OnInit {
         this.userService.login(value).subscribe(loggedInUser => {
             this.storage.set('user', loggedInUser).then(() => {
               this.userService.isAuthenticated.next(true);
+              this.userService.token.next(loggedInUser.token);
               this.loading.dismiss();
               this.router.navigate(['/news']);
             });
