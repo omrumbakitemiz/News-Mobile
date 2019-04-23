@@ -25,6 +25,10 @@ export class SignInPage implements OnInit {
   ) {
   }
 
+  ionViewWillEnter() {
+    this.resetForm();
+  }
+
   ngOnInit() {
     if (this.userService.isAuthenticated.value) {
       this.router.navigate(['/news']);
@@ -80,5 +84,12 @@ export class SignInPage implements OnInit {
       showCloseButton: true,
     });
     this.toast.present();
+  }
+
+  private resetForm() {
+    this.signInFormGroup.reset();
+    for (let controlsKey in this.signInFormGroup.controls) {
+      this.signInFormGroup.controls[controlsKey].setErrors(null);
+    }
   }
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Storage } from '@ionic/storage';
 import { LoadingController, ToastController } from '@ionic/angular';
 
 import { UserService } from '../news/services/user.service';
@@ -21,9 +20,12 @@ export class SignUpPage implements OnInit {
     private userService: UserService,
     public loadingController: LoadingController,
     public toastController: ToastController,
-    private router: Router,
-    private storage: Storage
+    private router: Router
   ) {
+  }
+
+  ionViewWillEnter() {
+    this.resetForm();
   }
 
   ngOnInit() {
@@ -79,5 +81,12 @@ export class SignUpPage implements OnInit {
       showCloseButton: true,
     });
     this.toast.present();
+  }
+
+  private resetForm() {
+    this.signUpFormGroup.reset();
+    for (let controlsKey in this.signUpFormGroup.controls) {
+      this.signUpFormGroup.controls[controlsKey].setErrors(null);
+    }
   }
 }

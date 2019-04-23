@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, IonRefresher, NavController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 
@@ -32,11 +32,15 @@ export class NewsComponent implements OnInit {
     private signalRService: NewsSignalrService,
     private userService: UserService,
     private route: ActivatedRoute,
+    private router: Router,
     private storage: Storage,
   ) {
   }
 
   ngOnInit() {
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
     this.storage.get('user').then(user => {
       if (user) {
         this.userService.isAuthenticated.next(true);
@@ -143,5 +147,11 @@ export class NewsComponent implements OnInit {
       newNewsArray = allNews.filter(news => news !== oldVersionOfUpdatedNews);
     }
     return newNewsArray;
+  }
+
+  public signOut() {
+    this.userService.isAuthenticated.next(false);
+    this.storage.remove('user');
+    this.router.navigate(['/sign-in']);
   }
 }
