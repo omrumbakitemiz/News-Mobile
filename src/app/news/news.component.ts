@@ -7,10 +7,10 @@ import { News } from './models/news';
 import { NewsType } from './models/news-types.enum';
 import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
+import { UserService } from './services/user.service';
 
 import { Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
-import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-news',
@@ -36,7 +36,7 @@ export class NewsComponent implements OnInit {
   ) {
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.storage.get('user').then(user => {
       if (user) {
         this.userService.isAuthenticated.next(true);
