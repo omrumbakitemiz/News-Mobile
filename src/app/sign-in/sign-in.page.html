@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title color="primary">Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form class="sign-in-form" [formGroup]="signInFormGroup" (ngSubmit)="onFormSubmit()">
+    <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
+      <mat-label>Username</mat-label>
+      <input type="text" matInput formControlName="username">
+      <mat-error *ngIf="signInFormGroup.get('username').hasError('username') && !signInFormGroup.get('username').hasError('required')">
+        Please enter a valid username
+      </mat-error>
+      <mat-error *ngIf="signInFormGroup.get('username').hasError('required')">
+        Username is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
+      <mat-label>Password</mat-label>
+      <input type="password" matInput formControlName="passwordHash">
+      <mat-error *ngIf="signInFormGroup.get('passwordHash').hasError('passwordHash') && !signInFormGroup.get('passwordHash').hasError('required')">
+        Please enter a valid password
+      </mat-error>
+      <mat-error *ngIf="signInFormGroup.get('passwordHash').hasError('required')">
+        Password is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+
+    <div class="d-flex flex-direction-column ion-align-items-center w-100">
+      <button class="sign-in-button" type="submit" mat-stroked-button color="primary">Sign In</button>
+      <a routerLink="/sign-up">Sign Up</a>
+    </div>
+  </form>
+</ion-content>

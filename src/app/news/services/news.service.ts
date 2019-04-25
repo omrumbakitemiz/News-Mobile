@@ -1,41 +1,46 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { News } from '../models/news';
 import { NewsType } from '../models/news-types.enum';
+import { baseUrl } from '../models/baseUrl';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NewsService {
-  url = 'https://immino-news-api.herokuapp.com/api/news';
+  newsUrl = `${ baseUrl }/news`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private userService: UserService) {
+  }
 
   getAllNews() {
-    return this.http.get<Array<News>>(this.url);
+    return this.http.get<Array<News>>(this.newsUrl);
   }
 
   saveNews(news: News) {
-    return this.http.post<News>(this.url, news);
+    return this.http.post<News>(this.newsUrl, news);
   }
 
   getAllNewsTypes() {
-    return this.http.get<Array<NewsType>>(`${this.url}/newsTypes`);
+    const headers = new HttpHeaders();
+    headers.append('Authentication', this.userService.token.value);
+    return this.http.get<Array<NewsType>>(`${ this.newsUrl }/newsTypes`, {headers: headers});
   }
 
   deleteNews(newsId: string) {
-    return this.http.delete(`${this.url}/${newsId}`);
+    return this.http.delete(`${ this.newsUrl }/${ newsId }`);
   }
 
   likeNews(newsId: string) {
-    return this.http.get(`${this.url}/like/${newsId}`);
+    return this.http.get(`${ this.newsUrl }/like/${ newsId }`);
   }
 
   dislikeNews(newsId: string) {
-    return this.http.get(`${this.url}/dislike/${newsId}`);
+    return this.http.get(`${ this.newsUrl }/dislike/${ newsId }`);
   }
 
   increaseViewCount(newsId: string) {
-    return this.http.get(`${this.url}/view/${newsId}`);
+    return this.http.get(`${ this.newsUrl }/view/${ newsId }`);
   }
 }

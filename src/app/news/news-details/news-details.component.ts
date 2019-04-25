@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, NavController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { News } from '../models/news';
@@ -7,6 +7,7 @@ import { News } from '../models/news';
 import { NewsService } from '../services/news.service';
 import { NewsSignalrService } from '../services/news-signalr.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-news-details',
@@ -17,6 +18,7 @@ export class NewsDetailsComponent {
   public selectedNewsId: string;
   public selectedNews: News;
   private getUpdatedNewsSubscription: Subscription;
+  private toast: HTMLIonToastElement;
 
   constructor(
     public navCtrl: NavController,
@@ -25,7 +27,7 @@ export class NewsDetailsComponent {
     private actionSheetController: ActionSheetController,
     private route: ActivatedRoute,
     private router: Router,
-    private newsSignalRService: NewsSignalrService
+    private toastController: ToastController,
   ) {
   }
 
@@ -52,24 +54,27 @@ export class NewsDetailsComponent {
   }
 
   ionViewWillLeave() {
-    console.log('viewWillLeave');
     this.signalRService.stopConnection().then(() => {
       this.getUpdatedNewsSubscription.unsubscribe();
     });
   }
 
   onLike() {
-    this.newsService.likeNews(this.selectedNews.id).subscribe(news => (this.selectedNews = news));
+    this.newsService.likeNews(this.selectedNews.id).subscribe(
+      news => this.selectedNews = news,
+      error => this.handleError(error));
   }
 
   onDislike() {
-    this.newsService.dislikeNews(this.selectedNews.id).subscribe(news => (this.selectedNews = news));
+    this.newsService.dislikeNews(this.selectedNews.id).subscribe(
+      news => this.selectedNews = news,
+      error => this.handleError(error));
   }
 
   onDelete() {
-    this.newsService.deleteNews(this.selectedNews.id).subscribe(() => {
-      this.navCtrl.navigateBack(['../news']);
-    });
+    this.newsService.deleteNews(this.selectedNews.id).subscribe(
+      () => this.navCtrl.navigateBack(['../news']),
+      error => this.handleError(error));
   }
 
   async presentActionSheet() {
@@ -89,5 +94,25 @@ export class NewsDetailsComponent {
       }]
     });
     await actionSheet.present();
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 403) {
+      this.presentToast(`${error.statusText} - You can not do this action!`);
+    }
+  }
+
+  async presentToast(error: string) {
+    console.log('error:', error);
+    let errorMessage = 'An error occured!';
+    if (error) {
+      errorMessage = error;
+    }
+    this.toast = await this.toastController.create({
+      message: errorMessage,
+      duration: 10000,
+      showCloseButton: true,
+    });
+    this.toast.present();
   }
 }

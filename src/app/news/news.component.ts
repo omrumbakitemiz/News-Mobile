@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, IonRefresher, NavController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 
@@ -7,6 +7,7 @@ import { News } from './models/news';
 import { NewsType } from './models/news-types.enum';
 import { NewsService } from './services/news.service';
 import { NewsSignalrService } from './services/news-signalr.service';
+import { UserService } from './services/user.service';
 
 import { Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
@@ -16,7 +17,7 @@ import { startWith } from 'rxjs/operators';
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss']
 })
-export class NewsComponent {
+export class NewsComponent implements OnInit {
   public allNews: Array<News>;
   public newsTypes: Array<NewsType>;
   public selectedNewsType: NewsType;
@@ -29,9 +30,23 @@ export class NewsComponent {
     public alertController: AlertController,
     private newsService: NewsService,
     private signalRService: NewsSignalrService,
+    private userService: UserService,
     private route: ActivatedRoute,
-    private storage: Storage
+    private router: Router,
+    private storage: Storage,
   ) {
+  }
+
+  ngOnInit() {
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
+    this.storage.get('user').then(user => {
+      if (user) {
+        this.userService.isAuthenticated.next(true);
+        this.userService.token.next(user.token);
+      }
+    });
   }
 
   async ionViewWillEnter() {
@@ -80,7 +95,8 @@ export class NewsComponent {
     if (this.selectedNewsType) {
       if (this.selectedNewsType.toString() === 'None') {
         this.allNews.map(news => (news.hidden = false));
-      } else {
+      }
+      else {
         this.allNews.map(news => {
           if (news.type) {
             news.hidden = news.type !== this.selectedNewsType;
@@ -131,5 +147,11 @@ export class NewsComponent {
       newNewsArray = allNews.filter(news => news !== oldVersionOfUpdatedNews);
     }
     return newNewsArray;
+  }
+
+  public signOut() {
+    this.userService.isAuthenticated.next(false);
+    this.storage.remove('user');
+    this.router.navigate(['/sign-in']);
   }
 }
