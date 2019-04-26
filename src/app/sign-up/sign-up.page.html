@@ -8,7 +8,7 @@
   <form class="sign-up-form" [formGroup]="signUpFormGroup" (ngSubmit)="onFormSubmit()">
     <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
       <mat-label>Username</mat-label>
-      <input type="text" matInput formControlName="username">
+      <input type="text" matInput formControlName="username" autocorrect="off" autocapitalize="none">
       <mat-error *ngIf="signUpFormGroup.get('username').hasError('username') && !signUpFormGroup.get('username').hasError('required')">
         Please enter a valid username
       </mat-error>
@@ -19,7 +19,7 @@
 
     <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
       <mat-label>Email</mat-label>
-      <input type="email" matInput placeholder="example@mail.com" formControlName="email">
+      <input type="email" matInput placeholder="example@mail.com" formControlName="email" autocorrect="off" autocapitalize="none">
       <mat-error *ngIf="signUpFormGroup.get('email').hasError('email') && !signUpFormGroup.get('email').hasError('required')">
         Please enter a valid email address
       </mat-error>
@@ -30,7 +30,7 @@
 
     <mat-form-field appearance="outline" class="w-100 ion-margin-bottom">
       <mat-label>Password</mat-label>
-      <input type="password" matInput formControlName="passwordHash">
+      <input type="password" matInput formControlName="passwordHash" autocorrect="off" autocapitalize="none">
       <mat-error *ngIf="signUpFormGroup.get('passwordHash').hasError('passwordHash') && !signUpFormGroup.get('passwordHash').hasError('required')">
         Please enter a valid password
       </mat-error>
