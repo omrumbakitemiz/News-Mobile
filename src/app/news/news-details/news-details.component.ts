@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActionSheetController, NavController, ToastController } from '@ionic/angular';
+import { ActionSheetController, NavController, ToastController, LoadingController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { News } from '../models/news';
@@ -19,6 +19,7 @@ export class NewsDetailsComponent {
   public selectedNews: News;
   private getUpdatedNewsSubscription: Subscription;
   private toast: HTMLIonToastElement;
+  private loader: HTMLIonLoadingElement;
 
   constructor(
     public navCtrl: NavController,
@@ -26,30 +27,37 @@ export class NewsDetailsComponent {
     private signalRService: NewsSignalrService,
     private actionSheetController: ActionSheetController,
     private route: ActivatedRoute,
-    private router: Router,
     private toastController: ToastController,
+    private loadingController: LoadingController,
   ) {
   }
 
   ionViewWillEnter() {
+    this.presentLoading();
     this.route.params.subscribe(params => {
       this.selectedNewsId = params['id'];
 
-      this.signalRService.startConnection().then(() => {
-        this.signalRService.addLikeListener();
-        this.signalRService.addDislikeListener();
-        this.signalRService.addViewListener();
+      if (this.selectedNewsId) {
+        this.signalRService.startConnection().then(() => {
+          this.signalRService.addLikeListener();
+          this.signalRService.addDislikeListener();
+          this.signalRService.addViewListener();
 
-        this.newsService.increaseViewCount(this.selectedNewsId).subscribe(news => {
-          this.selectedNews = news;
-        });
+          this.newsService.increaseViewCount(this.selectedNewsId).subscribe(news => {
+            this.selectedNews = news;
+            this.loader.dismiss();
+          });
 
-        this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(updatedNews => {
-          if (updatedNews) {
-            this.selectedNews = updatedNews;
-          }
+          this.getUpdatedNewsSubscription = this.signalRService.getUpdatedNews().subscribe(updatedNews => {
+            if (updatedNews) {
+              this.selectedNews = updatedNews;
+            }
+          });
         });
-      });
+      } else {
+        this.loader.dismiss();
+        this.presentToast('Cannot read news data, please try again 😇');
+      }
     });
   }
 
@@ -100,6 +108,13 @@ export class NewsDetailsComponent {
     if (error.status === 403) {
       this.presentToast(`${error.statusText} - You can not do this action!`);
     }
+  }
+
+  async presentLoading() {
+    this.loader = await this.loadingController.create({
+      message: 'Please wait...'
+    });
+    await this.loader.present();
   }
 
   async presentToast(error: string) {

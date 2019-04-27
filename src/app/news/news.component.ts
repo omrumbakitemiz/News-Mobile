@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonRefresher, NavController } from '@ionic/angular';
+import { AlertController, IonRefresher, NavController, LoadingController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 
 import { News } from './models/news';
@@ -24,6 +24,7 @@ export class NewsComponent implements OnInit {
   public loaded = false;
   private getUpdatedNewsSubscription: Subscription;
   private cachedNews: Array<News>;
+  private loader: HTMLIonLoadingElement;
 
   constructor(
     public navCtrl: NavController,
@@ -34,6 +35,7 @@ export class NewsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private storage: Storage,
+    private loadingController: LoadingController,
   ) {
   }
 
@@ -50,6 +52,7 @@ export class NewsComponent implements OnInit {
   }
 
   async ionViewWillEnter() {
+    this.presentLoading();
     this.newsService.getAllNewsTypes().subscribe(newsTypes => this.newsTypes = newsTypes);
     this.cachedNews = await this.storage.get('allNews');
 
@@ -75,9 +78,13 @@ export class NewsComponent implements OnInit {
               this.allNews = this.allNews.sort(this.sortFunction);
               this.storage.set('allNews', this.allNews);
             }
+            this.loader.dismiss();
           });
         });
-      }, () => this.presentAlert('Cannot get news right now, please try again later. 😇')
+      }, () => {
+        this.loader.dismiss();
+        this.presentAlert('Cannot get news right now, please try again later. 😇');
+      }
     );
   }
 
@@ -116,6 +123,13 @@ export class NewsComponent implements OnInit {
     alert.onDidDismiss().then(() => this.loaded = true);
 
     await alert.present();
+  }
+
+  async presentLoading() {
+    this.loader = await this.loadingController.create({
+      message: 'Please wait...'
+    });
+    await this.loader.present();
   }
 
   refreshNews(event: CustomEvent<IonRefresher>) {

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { News } from '../models/news';
 import { NewsType } from '../models/news-types.enum';
 import { baseUrl } from '../models/baseUrl';
-import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +10,7 @@ import { UserService } from './user.service';
 export class NewsService {
   newsUrl = `${ baseUrl }/news`;
 
-  constructor(private http: HttpClient, private userService: UserService) {
+  constructor(private http: HttpClient) {
   }
 
   getAllNews() {
@@ -23,9 +22,7 @@ export class NewsService {
   }
 
   getAllNewsTypes() {
-    const headers = new HttpHeaders();
-    headers.append('Authentication', this.userService.token.value);
-    return this.http.get<Array<NewsType>>(`${ this.newsUrl }/newsTypes`, {headers: headers});
+    return this.http.get<Array<NewsType>>(`${ this.newsUrl }/newsTypes`);
   }
 
   deleteNews(newsId: string) {
